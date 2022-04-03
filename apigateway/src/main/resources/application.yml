@@ -1,0 +1,50 @@
+server:
+  port: 9003
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+      - id: customer-service
+        uri: lb://customer-service
+        predicates:
+        - Path=/customer/**
+        filters:
+        - name: CircuitBreaker
+          args:
+            name: customer-service
+            fallbackuri: forward:/userServiceFallback
+      - id: product-service
+        uri: lb://product-service
+        predicates:
+        - Path=/product/**
+        filters:
+        - name: CircuitBreaker
+          args:
+            name: product-service
+            fallbackuri: forward:/productServiceFallback
+  config:
+    import:
+    - configserver:http://localhost:9005
+
+#Hystrix Configuration
+hystrix:
+  command:
+    fallbackcmd:
+      execution:
+        isolation:
+          thread:
+            timeoutInMillisecond: 5000         
+
+#Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: hystrix.stream
+   
+
+
+

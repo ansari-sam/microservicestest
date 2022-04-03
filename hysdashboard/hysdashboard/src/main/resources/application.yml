@@ -1,0 +1,13 @@
+server:
+  port: 9004
+
+spring:
+  application:
+    name: hystrix-dashboard
+  config:
+    import:
+    - configserver:http://localhost:9005
+    
+hystrix:
+  dashboard:
+    proxy-stream-allow-list: '*'
